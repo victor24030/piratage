@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de test de sécurité</title>
+</head>
+<body>
+    <h1>Test de vulnérabilités courantes</h1>
+
+    <!-- Injection XSS via URL -->
+    <section>
+        <h2>XSS via URL</h2>
+        <p id="url-vulnerable">
+            Message : <span id="url-message"></span>
+        </p>
+        <script>
+            // Vulnérabilité : Affiche directement les paramètres de l'URL
+            const params = new URLSearchParams(window.location.search);
+            document.getElementById("url-message").innerHTML = params.get("message");
+        </script>
+        <p>Test : Ajoutez `?message=<script>alert('XSS')</script>` dans l'URL.</p>
+    </section>
+
+    <!-- Injection XSS via champ de texte -->
+    <section>
+        <h2>XSS via champ de texte</h2>
+        <form id="xss-form">
+            <label for="xss-input">Entrez un texte :</label>
+            <input type="text" id="xss-input" name="xss-input" />
+            <button type="button" onclick="submitXSS()">Envoyer</button>
+        </form>
+        <p id="xss-output"></p>
+        <script>
+            // Vulnérabilité : Affiche directement le contenu soumis
+            function submitXSS() {
+                const userInput = document.getElementById("xss-input").value;
+                document.getElementById("xss-output").innerHTML = "Vous avez écrit : " + userInput;
+            }
+        </script>
+        <p>Test : Entrez `<script>alert('XSS')</script>` dans le champ ci-dessus.</p>
+    </section>
+
+    <!-- Injection SQL simulée -->
+    <section>
+        <h2>Injection SQL</h2>
+        <form id="sql-form">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" name="username" />
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" />
+            <button type="button" onclick="submitSQL()">Se connecter</button>
+        </form>
+        <p id="sql-output"></p>
+        <script>
+            // Vulnérabilité simulée : Affiche une requête SQL
+            function submitSQL() {
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+                const fakeQuery = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}';`;
+                document.getElementById("sql-output").innerText = "Requête SQL exécutée : " + fakeQuery;
+            }
+        </script>
+        <p>Test : Entrez `' OR '1'='1` comme nom d'utilisateur et mot de passe.</p>
+    </section>
+
+    <!-- Test de manipulation des cookies -->
+    <section>
+        <h2>Manipulation des cookies</h2>
+        <button onclick="setCookie()">Créer un cookie</button>
+        <button onclick="readCookie()">Lire le cookie</button>
+        <button onclick="deleteCookie()">Supprimer le cookie</button>
+        <p id="cookie-output"></p>
+        <script>
+            // Fonction pour gérer les cookies
+            function setCookie() {
+                document.cookie = "testCookie=12345; path=/";
+                document.getElementById("cookie-output").innerText = "Cookie créé.";
+            }
+
+            function readCookie() {
+                document.getElementById("cookie-output").innerText = "Cookies : " + document.cookie;
+            }
+
+            function deleteCookie() {
+                document.cookie = "testCookie=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/";
+                document.getElementById("cookie-output").innerText = "Cookie supprimé.";
+            }
+        </script>
+        <p>Test : Utilisez la console ou les outils de navigateur pour manipuler les cookies.</p>
+    </section>
+</body>
+</html>
