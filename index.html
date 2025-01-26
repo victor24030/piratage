@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de test de sécurité - Vulnérabilités XSS et SQL Injection</title>
+</head>
+<body>
+    <h1>Page de Test de Sécurité</h1>
+    <p>Bienvenue sur cette page de test où tu peux apprendre et tester différentes vulnérabilités courantes utilisées dans les attaques de piratage. Cette page est volontairement vulnérable pour des raisons pédagogiques.</p>
+
+    <section>
+        <h2>1. Injection XSS via URL</h2>
+        <p>Le XSS (Cross-Site Scripting) est une vulnérabilité qui permet à un attaquant d'exécuter du code JavaScript dans le navigateur d'un autre utilisateur.</p>
+        <p>Test : Tu peux injecter un script dans l'URL pour voir comment l'application peut afficher ce script dans la page sans l'exécuter correctement.</p>
+        <p>Exemple d'URL vulnérable : <code>?message=<script>alert('XSS')</script></code></p>
+
+        <p id="url-vulnerable">Message : <span id="url-message"></span></p>
+        <script>
+            // Exemple d'injection XSS via URL
+            const params = new URLSearchParams(window.location.search);
+            document.getElementById("url-message").innerHTML = params.get("message");
+        </script>
+    </section>
+
+    <section>
+        <h2>2. Injection XSS via champ de texte</h2>
+        <p>En utilisant un champ de saisie, on peut insérer un script malveillant et observer comment l'application exécute le code JavaScript dans le navigateur.</p>
+        <form id="xss-form">
+            <label for="xss-input">Entrez un texte (test XSS) :</label>
+            <input type="text" id="xss-input" name="xss-input" />
+            <button type="button" onclick="submitXSS()">Envoyer</button>
+        </form>
+        <p>Test : Essaye de saisir un script comme <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code> dans le champ ci-dessus.</p>
+        <p id="xss-output"></p>
+
+        <script>
+            // Exemple d'injection XSS via champ de texte
+            function submitXSS() {
+                const userInput = document.getElementById("xss-input").value;
+                document.getElementById("xss-output").innerHTML = "Vous avez écrit : " + userInput;
+            }
+        </script>
+    </section>
+
+    <section>
+        <h2>3. Injection SQL</h2>
+        <p>L'injection SQL permet de manipuler les requêtes SQL d'une application pour obtenir des informations sensibles ou contourner l'authentification.</p>
+        <p>Test : Saisis la commande suivante dans les champs de nom d'utilisateur et mot de passe pour tenter d'exécuter une injection SQL.</p>
+        <p>Exemple d'injection : <code>' OR '1'='1</code></p>
+
+        <form id="sql-form">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" id="username" name="username" />
+            <label for="password">Mot de passe :</label>
+            <input type="password" id="password" name="password" />
+            <button type="button" onclick="submitSQL()">Se connecter</button>
+        </form>
+        <p id="sql-output"></p>
+
+        <script>
+            // Exemple de simulation d'injection SQL
+            function submitSQL() {
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+                const fakeQuery = `SELECT * FROM users WHERE username = '${username}' AND password = '${password}';`;
+                document.getElementById("sql-output").innerText = "Requête SQL générée : " + fakeQuery;
+            }
+        </script>
+    </section>
+
+    <section>
+        <h2>Comment fonctionne une injection SQL ?</h2>
+        <p>Une injection SQL est possible lorsque l'application prend directement les données fournies par l'utilisateur et les insère dans une requête SQL sans validation ni filtrage. Cela permet à un attaquant de modifier la logique de la requête pour exécuter des commandes SQL arbitraires.</p>
+        <p>Exemple de requête vulnérable :
+        <pre>SELECT * FROM users WHERE username = 'utilisateur' AND password = 'motdepasse';</pre>
+        Si l'attaquant entre <code>' OR '1'='1</code> dans le nom d'utilisateur et n'importe quoi dans le mot de passe, la requête devient :
+        <pre>SELECT * FROM users WHERE username = '' OR '1'='1' AND password = 'nimportequoi';</pre>
+        Ce qui rend la condition `'1'='1'` toujours vraie et permet de contourner l'authentification.</p>
+    </section>
+
+    <section>
+        <h2>Conseils pour éviter les vulnérabilités :</h2>
+        <ul>
+            <li>Utilise des **requêtes préparées** et des **paramètres de liaison** pour éviter l'injection SQL.</li>
+            <li>Échappe toutes les entrées utilisateur pour éviter les attaques XSS.</li>
+            <li>Ne jamais faire confiance aux entrées utilisateur sans validation.</li>
+            <li>Utilise des mécanismes de sécurité comme les **tokens CSRF** pour protéger tes formulaires.</li>
+        </ul>
+    </section>
+
+</body>
+</html>
